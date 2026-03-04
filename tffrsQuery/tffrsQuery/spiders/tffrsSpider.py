@@ -53,8 +53,12 @@ class TffrsspiderSpider(scrapy.Spider):
         last_name = response.meta["last_name"]
         for event in events:
             event_pr = response.xpath(
-                f'//td[contains(@class,"panel-heading-text") and contains(@class,"font-weight-500") and normalize-space(.)="{event}"] /following-sibling::td[1]//a/text()').get() or ""
-            if event_pr != "":
+                f'//table[.//tr[contains(concat(" ",normalize-space(@class)," "), " highlight ")]]//tr[contains(concat(" ",normalize-space(@class)," "), " highlight ")]/td[normalize-space(.)="{event}"]/following-sibling::td[1]//a/text()').get(
+                default="").strip() or ""
+            event_date = response.xpath(
+                f'//table[.//tr[contains(@class,"highlight")]/td[normalize-space(.)="{event}"]]//thead//span/text()').get(
+                default="").strip() or ""
+            if event_pr != "" and event_date != "":
                 print(event + ":" + event_pr)
             else:
                 raise ValueError(f"Athlete '{last_name}', '{first_name}' has no entry for event:'{event}'")
