@@ -60,5 +60,6 @@ class TffrsspiderSpider(scrapy.Spider):
                 default="").strip() or ""
             if event_pr != "" and event_date != "":
                 print(event + ":" + event_pr)
+                print(event + " date:" + event_date)
             else:
                 raise ValueError(f"Athlete '{last_name}', '{first_name}' has no entry for event:'{event}'")
