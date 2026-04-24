@@ -12,7 +12,7 @@ CREATE TABLE Coach (
 	last_name varchar(50),
 	phone_number varchar(12), -- e.g., "980-727-9900"
 	email varchar(50),
-    password
+    password_hash VARCHAR(255) NOT NULL,
 	PRIMARY KEY (id) -- Primary Key for Coach Table
 );
 
@@ -23,6 +23,7 @@ CREATE TABLE Trainer (
 	last_name varchar(50),
 	phone_number varchar(12), -- e.g., "980-727-9900"
 	email varchar(50),
+    password_hash VARCHAR(255) NOT NULL,
 	PRIMARY KEY (id) -- Primary Key for Trainer Table
 );
 
@@ -37,7 +38,9 @@ CREATE TABLE Athlete (
 	sex enum('M','F','U'), -- U = unspecified?
 	grad_year varchar(4), -- e.g., 2028
 	event varchar(150), -- e.g., "60 m, 100 m, long jump, pentathlon" --> not atomic but an athlete can have multiple events?
-	coach_id int,
+	email varchar(50),
+    password_hash VARCHAR(255) NOT NULL,
+    coach_id int,
 	trainer_id int,
 	FOREIGN KEY (coach_id) REFERENCES Coach(id), -- Foreign Key to reference Coach Table for id
 	FOREIGN KEY (trainer_id) REFERENCES Trainer(id), -- Foreign Key to reference Trainer Table for id
@@ -77,7 +80,7 @@ CREATE TABLE Injury (
 -- Create Treatment Table with incrementing ID.
 CREATE TABLE Treatment (
 	id int NOT NULL AUTO_INCREMENT,
-	type enum('fracture', 'broken bone', 'etc.'), -- probably add more to this...
+	type enum('scrape', 'ice', 'etc.'), -- probably add more to this...
 	date date,
 	athlete_id int,
 	trainer_id int, 
