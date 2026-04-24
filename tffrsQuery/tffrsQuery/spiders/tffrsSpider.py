@@ -1,15 +1,17 @@
 import scrapy
-from .spiderHelpers import stateAbbreviation, maleOrFemale
+from .spiderHelpers import stateAbbreviation, maleOrFemale, dateHelper
 # example: scrapy crawl tffrsSpider -a team_state="North Carolina" -a team_name="Davidson" -a gender="Male" -a athlete_first_name="Bradley" -a athlete_last_name="Cruthirds" -a events="400H"
 
 class TffrsspiderSpider(scrapy.Spider):
+    """
+    This spider scrapes the TFRRS website for an athlete's personal records in specified events.
+    """
     name = "tffrsSpider"
     allowed_domains = ["www.tfrrs.org"]
     start_urls = ["https://www.tfrrs.org/"]
     url_main = "https://www.tfrrs.org"
 
     async def start(self):
-
         team_state = getattr(self, "team_state", None)
         team_name = getattr(self, "team_name", None)
         athlete_gender = getattr(self, "gender", None)
@@ -17,7 +19,10 @@ class TffrsspiderSpider(scrapy.Spider):
         last_name = getattr(self, "athlete_last_name", None)
         events = getattr(self, "events", None)
 
-        if team_state is None or team_name is None or athlete_gender is None or first_name is None or last_name is None or events is None:
+        if (team_state is None or team_name is None or athlete_gender
+                is None or first_name is None or last_name is None
+                or events is None ):
+        #):
             raise ValueError("Missing required arguments. Please provide team_state, team_name, athlete_gender, athlete_first_name, athlete_last_name, and event.")
 
 
@@ -60,6 +65,7 @@ class TffrsspiderSpider(scrapy.Spider):
                 default="").strip() or ""
             if event_pr != "" and event_date != "":
                 print(event + ":" + event_pr)
+                event_date = dateHelper.convert_date(event_date)
                 print(event + " date:" + event_date)
             else:
                 raise ValueError(f"Athlete '{last_name}', '{first_name}' has no entry for event:'{event}'")

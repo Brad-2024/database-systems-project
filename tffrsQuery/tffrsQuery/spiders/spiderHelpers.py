@@ -64,3 +64,27 @@ class maleOrFemale():
             "female": "f"
         }
         return gender_dict.get(gender)
+
+class dateHelper():
+
+    @staticmethod
+    def convert_date(date_str):
+        date_dict = {
+            "Jan": "01",
+            "Feb": "02",
+            "Mar": "03",
+            "Apr": "04",
+            "May": "05",
+            "Jun": "06",
+            "Jul": "07",
+            "Aug": "08",
+            "Sep": "09",
+            "Oct": "10",
+            "Nov": "11",
+            "Dec": "12"
+        }
+        date_str = date_str.replace(",", "")
+        date_parts = date_str.split(" ")
+        date_parts[0] = date_dict.get(date_parts[0])
+        date_str = date_parts[2] + "-" + date_parts[0] + "-" + date_parts[1]
+        return date_str
