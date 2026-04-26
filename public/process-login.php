@@ -52,7 +52,7 @@ if (mysqli_stmt_fetch($statement) && password_verify($password, $hashedPassword)
     $_SESSION['user_name'] = $userName;
     $_SESSION['user_role'] = $userRole;
 
-    redirect('dashboard.php');
+    redirect('index.php');
 }
 
 mysqli_stmt_close($statement);
