@@ -5,43 +5,47 @@ CREATE DATABASE Track;
 -- Use Track database.
 USE Track;
 
+CREATE TABLE Users (
+    id int NOT NULL AUTO_INCREMENT,
+    first_name varchar(50),
+	last_name varchar(50),
+    email varchar(50),
+    password_hash VARCHAR(255) NOT NULL,
+    role enum('coach', 'trainer', 'athlete'),
+    PRIMARY KEY (id)
+)
+
 -- Create Coach Table with incrementing ID.
 CREATE TABLE Coach (
 	id int NOT NULL AUTO_INCREMENT,
-	first_name varchar(50),
-	last_name varchar(50),
+    user_id int,
 	phone_number varchar(12), -- e.g., "980-727-9900"
-	email varchar(50),
-    password_hash VARCHAR(255) NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES Users(id),
 	PRIMARY KEY (id) -- Primary Key for Coach Table
 );
 
 -- Create Trainer Table with incrementing ID.
 CREATE TABLE Trainer (
 	id int NOT NULL AUTO_INCREMENT,
-	first_name varchar(50),
-	last_name varchar(50),
+    user_id int,
 	phone_number varchar(12), -- e.g., "980-727-9900"
-	email varchar(50),
-    password_hash VARCHAR(255) NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES Users(id),
 	PRIMARY KEY (id) -- Primary Key for Trainer Table
 );
 
 -- Create Athlete Table with incrementing ID.
 CREATE TABLE Athlete (
 	id int NOT NULL AUTO_INCREMENT,
-	first_name varchar(50),
-	last_name varchar(50),
+    user_id int,
 	height varchar(7), -- e.g., 5' 11''
 	weight int,
 	dob date,
 	sex enum('M','F','U'), -- U = unspecified?
 	grad_year varchar(4), -- e.g., 2028
 	event varchar(150), -- e.g., "60 m, 100 m, long jump, pentathlon" --> not atomic but an athlete can have multiple events?
-	email varchar(50),
-    password_hash VARCHAR(255) NOT NULL,
     coach_id int,
 	trainer_id int,
+    FOREIGN KEY (user_id) REFERENCES Users(id),
 	FOREIGN KEY (coach_id) REFERENCES Coach(id), -- Foreign Key to reference Coach Table for id
 	FOREIGN KEY (trainer_id) REFERENCES Trainer(id), -- Foreign Key to reference Trainer Table for id
 	PRIMARY KEY (id) -- Primary Key for Athlete Table
