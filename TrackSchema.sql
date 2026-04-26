@@ -13,7 +13,7 @@ CREATE TABLE Users (
     password_hash VARCHAR(255) NOT NULL,
     role enum('coach', 'trainer', 'athlete'),
     PRIMARY KEY (id)
-)
+);
 
 -- Create Coach Table with incrementing ID.
 CREATE TABLE Coach (
