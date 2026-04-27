@@ -1,14 +1,15 @@
 /* Views */
 
 -- ActiveInjuries: shows all athletes with active injuries alongside their injury type and occurrence date
+-- (complete)
 
 DROP VIEW IF EXISTS ActiveInjuries;
 
 CREATE VIEW ActiveInjuries AS
 SELECT id, first_name, last_name, type, occurence_date FROM 
 ((SELECT id, first_name, last_name FROM Users
-WHERE role = 'athlete') as athletes JOIN Injury
-ON athletes.id = Injury.athlete_id) as athlete_injuries
+WHERE role = 'athlete') AS athletes JOIN Injury
+ON athletes.id = Injury.athlete_id) AS athlete_injuries
 WHERE active = 'Y'
 ORDER BY last_name ASC;
 
@@ -23,25 +24,34 @@ CREATE VIEW CurrentPerformanceTrends AS
 SELECT * FROM CurrentPerformanceTrends;
 
 -- WeeklyTrainingSuccessScore: shows each athlete's average workout success score over past 7 days
-
+-- (complete)
 DROP VIEW IF EXISTS WeeklyTrainingSuccessScore;
 
 CREATE VIEW WeeklyTrainingSuccessScore AS
 SELECT athlete_id, first_name, last_name, average_success_score 
-FROM ((SELECT athlete_id, (SUM(workout_success)/7) as average_success_score FROM Workout 
-WHERE date >= CURDATE() - INTERVAL 7 DAY
-GROUP BY athlete_id) as average JOIN Users 
-ON athlete_id = Users.id) as athlete_and_average
+FROM ((SELECT athlete_id, (SUM(workout_success)/7) AS average_success_score FROM Workout 
+WHERE `date` >= CURDATE() - INTERVAL 7 DAY
+GROUP BY athlete_id) AS average JOIN Users 
+ON athlete_id = Users.id) AS athlete_and_average
 ORDER BY average_success_score DESC;
 
 SELECT * FROM WeeklyTrainingSuccessScore;
 
 -- WeeklyTrainingDistance: shows each athlete's average distance over the past 7 days
--- (in-progress)
-SELECT athlete_id, (SUM(distance)/7) as average_distance FROM Workout, Workout_Set
-WHERE 
+-- (complete)
+DROP VIEW IF EXISTS WeeklyTrainingDistance; 
 
-SELECT * FROM WeeklyTrainingTrends;
+CREATE VIEW WeeklyTrainingDistance AS
+SELECT athlete_id, first_name, last_name, SUM(distance)/7 AS average_distance FROM 
+(SELECT wt_id, athlete_id, first_name, last_name, distance
+FROM ((SELECT id AS wt_id, athlete_id FROM Workout
+WHERE `date` >= CURDATE() - INTERVAL 7 DAY) AS workouts JOIN Users 
+ON athlete_id = Users.id) AS workouts_with_athletes JOIN Workout_Set
+ON wt_id = workout_id) AS workout_sets
+GROUP BY athlete_id
+ORDER BY average_distance DESC;
+
+SELECT * FROM WeeklyTrainingDistance;
 
 -- training readiness indicator (red, orange, or green) based on recent data such as workouts, sleep, and soreness over 7–30 days
 -- avg workout success (7 days), active injuries, and avg daily calories (30 days)
