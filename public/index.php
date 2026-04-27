@@ -17,14 +17,19 @@ $userRole = $_SESSION['user_role'] ?? 'Role';
     <link rel="stylesheet" href="../css/main.css">
 </head>
 <body>
+<nav>
+    <ul>
+        <li class="current"><a href="index.php">Home</a></li>
+        <?php if ($userRole === 'coach'): ?>
+            <li><a href="manage-athletes.php">Manage Athletes</a></li>
+        <?php endif; ?>
+        <li><a href="logout.php">Log Out</a></li>
+    </ul>
+</nav>
 <main class="page">
     <section class="card">
         <h1>Dashboard</h1>
         <p class="welcome">Welcome, <?php echo escape($userName); ?></p>
-        <?php if ($userRole === 'coach'): ?>
-            <a href="manage-athletes.php" class="button">Manage Athletes</a>
-        <?php endif; ?>
-        <a href="logout.php" class="button button-link">Log Out</a>
     </section>
 </main>
 </body>
