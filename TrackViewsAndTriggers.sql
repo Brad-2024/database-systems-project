@@ -1,62 +1,23 @@
 /* Views */
 
--- example
+-- ActiveInjuries: shows all athletes with active injuries alongside their injury type and occurrence date
 
-DROP VIEW IF EXISTS TopAces;
+DROP VIEW IF EXISTS ActiveInjuries;
 
-CREATE VIEW TopAces AS
-SELECT name FROM player,
-(SELECT player_id, SUM(ace_count) AS total_aces
-FROM (
-    SELECT `match`.w_ace AS ace_count, `match`.winner_id AS player_id
-    FROM `match`
-    JOIN player ON player.id = `match`.winner_id
-    JOIN tourney ON tourney.id = `match`.tourney_id
-    WHERE `match`.w_ace > 0
+CREATE VIEW ActiveInjuries AS
+SELECT id, first_name, last_name, type, occurence_date FROM 
+((SELECT id, first_name, last_name FROM Users
+WHERE role = 'athlete') as athletes JOIN Injury
+ON athletes.id = Injury.athlete_id) as athlete_injuries
+WHERE active = 'Y';
 
-    UNION ALL
+SELECT * FROM ActiveInjuries;
 
-    SELECT `match`.l_ace AS ace_count, `match`.loser_id AS player_id
-    FROM `match`
-    JOIN player ON player.id = `match`.loser_id
-    JOIN tourney ON tourney.id = `match`.tourney_id
-    WHERE `match`.l_ace > 0
-) AS stats
-GROUP BY player_id) AS grouped_aces
-WHERE player.id = grouped_aces.player_id
-ORDER BY total_aces DESC
-LIMIT 10;
+-- CurrentPerformanceTrends: shows each athlete's most recent race time per event compared to their personal best
 
-SELECT * FROM TopAces;
+DROP VIEW IF EXISTS CurrentPerformanceTrends;
 
--- active_injuries
--- Shows all athletes with active injuries alongside their injury type, occurrence date, and latest treatment
-
-DROP VIEW IF EXISTS active_injuries;
-
-CREATE VIEW active_injuries AS
-SELECT
-    a.id AS athlete_id,
-    CONCAT(u.first_name, ' ', u.last_name) AS athlete_name,
-    i.type AS injury_type,
-    i.occurence_date,
-    MAX(t.date) AS last_treatment_date,
-    t.type AS last_treatment_type
-FROM Athlete a
-JOIN Users u ON u.id = a.user_id
-JOIN Treatment t ON t.athlete_id = a.id
-JOIN Injury i ON i.id = t.injury_id
-WHERE i.active = 'Y'
-GROUP BY a.id, u.first_name, u.last_name, i.id, i.type, i.occurence_date, t.type;
-
-SELECT * FROM active_injuries;
-
--- current_performance_trends
--- Shows each athlete's most recent race time per event compared to their personal best
-
-DROP VIEW IF EXISTS current_performance_trends;
-
-CREATE VIEW current_performance_trends AS
+CREATE VIEW CurrentPerformanceTrends AS
 SELECT
     a.id AS athlete_id,
     CONCAT(u.first_name, ' ', u.last_name) AS athlete_name,

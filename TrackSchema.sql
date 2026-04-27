@@ -78,6 +78,8 @@ CREATE TABLE Injury (
 	type enum('fracture', 'broken bone', 'etc.'), -- probably add more to this...
 	occurence_date date,
 	active enum('Y','N'),
+	athlete_id int,
+	FOREIGN KEY (athlete_id) REFERENCES Athlete(id),
 	PRIMARY KEY (id) -- Primary Key for Injury Table
 );
 
