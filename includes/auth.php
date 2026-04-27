@@ -6,7 +6,7 @@ function requireRole($allowedRoles)
 {
     requireLogin();
 
-    if (!in_array($_SESSION['role'], $allowedRoles)) {
+    if (!in_array($_SESSION['user_role'], $allowedRoles)) {
         http_response_code(403);
         exit('Forbidden');
     }
