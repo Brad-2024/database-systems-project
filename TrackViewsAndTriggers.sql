@@ -35,14 +35,13 @@ JOIN Users u ON u.id = a.user_id
 JOIN Race r ON r.athlete_id = a.id
 GROUP BY a.id, u.first_name, u.last_name, r.event;
 
-SELECT * FROM current_performance_trends;
+SELECT * FROM CurrentPerformanceTrends;
 
--- weekly_training_trends
--- Shows each athlete's average workout success score and total training volume (distance) over the past 7 days
+-- WeeklyTrainingTrends: shows each athlete's average workout success score and total training volume (distance) over the past 7 days
 
-DROP VIEW IF EXISTS weekly_training_trends;
+DROP VIEW IF EXISTS WeeklyTrainingTrends;
 
-CREATE VIEW weekly_training_trends AS
+CREATE VIEW WeeklyTrainingTrends AS
 SELECT
     a.id AS athlete_id,
     CONCAT(u.first_name, ' ', u.last_name) AS athlete_name,
@@ -56,14 +55,14 @@ JOIN Workout_Set ws ON ws.workout_id = w.id
 WHERE w.date >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)
 GROUP BY a.id, u.first_name, u.last_name;
 
-SELECT * FROM weekly_training_trends;
+SELECT * FROM WeeklyTrainingTrends;
 
 -- training readiness indicator (red, orange, or green) based on recent data such as workouts, sleep, and soreness over 7–30 days
 -- avg workout success (7 days), active injuries, and avg daily calories (30 days)
 
-DROP VIEW IF EXISTS training_readiness_indicator;
+DROP VIEW IF EXISTS TrainingReadinessIndicator;
 
-CREATE VIEW training_readiness_indicator AS
+CREATE VIEW TrainingReadinessIndicator AS
 SELECT
     a.id AS athlete_id,
     CONCAT(u.first_name, ' ', u.last_name) AS athlete_name,
@@ -89,7 +88,7 @@ LEFT JOIN (
 ) AS daily_calories ON daily_calories.athlete_id = a.id
 GROUP BY a.id, u.first_name, u.last_name;
 
-SELECT * FROM training_readiness_indicator;
+SELECT * FROM TrainingReadinessIndicator;
 
 /* Triggers */
 
