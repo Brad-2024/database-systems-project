@@ -7,7 +7,7 @@ requireLogin();
 requireRole(['coach']);
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    redirect('usermanage.php');
+    redirect('manage-athletes.php');
 }
 
 $role = $_POST['role'] ?? '';
@@ -120,7 +120,7 @@ try {
 
     if ($role === 'athlete') {
         $query = "
-            INSERT INTO athletes
+            INSERT INTO athlete
             (user_id, height, weight, dob, sex, grad_year, event)
             VALUES (?, ?, ?, ?, ?, ?, ?)
         ";
@@ -145,7 +145,7 @@ try {
 
     } elseif ($role === 'coach') {
         $query = "
-            INSERT INTO coaches
+            INSERT INTO coach
             (user_id, phone_number)
             VALUES (?, ?)
         ";
@@ -160,7 +160,7 @@ try {
 
     } elseif ($role === 'trainer') {
         $query = "
-            INSERT INTO trainers
+            INSERT INTO trainer
             (user_id, phone_number)
             VALUES (?, ?)
         ";
@@ -183,11 +183,11 @@ try {
     mysqli_commit($connection);
 
     setFlashData('success', 'User added successfully.');
-    redirect('usermanage.php');
+    redirect('manage-athletes.php');
 
 } catch (Exception $e) {
     mysqli_rollback($connection);
 
     setFlashData('error', $e->getMessage());
-    redirect('usermanage.php');
+    redirect('manage-athletes.php');
 }
