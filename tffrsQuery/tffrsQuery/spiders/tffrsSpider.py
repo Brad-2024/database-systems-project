@@ -58,14 +58,25 @@ class TffrsspiderSpider(scrapy.Spider):
         last_name = response.meta["last_name"]
         for event in events:
             event_pr = response.xpath(
-                f'//table[.//tr[contains(concat(" ",normalize-space(@class)," "), " highlight ")]]//tr[contains(concat(" ",normalize-space(@class)," "), " highlight ")]/td[normalize-space(.)="{event}"]/following-sibling::td[1]//a/text()').get(
-                default="").strip() or ""
+                f'//div[contains(concat(" ", normalize-space(@class), " "), " panel-body ")]'
+                f'//table//tr/td[normalize-space(.)="{event}"]/following-sibling::td[1]//a/text()'
+            ).getall()
+
             event_date = response.xpath(
-                f'//table[.//tr[contains(@class,"highlight")]/td[normalize-space(.)="{event}"]]//thead//span/text()').get(
-                default="").strip() or ""
-            if event_pr != "" and event_date != "":
-                print(event + ":" + event_pr)
-                event_date = dateHelper.convert_date(event_date)
-                print(event + " date:" + event_date)
+                f'//div[contains(concat(" ", normalize-space(@class), " "), " panel-body ")]'
+                f'//table[.//tr/td[normalize-space(.)="{event}"]]//thead//span/text()'
+            ).getall()
+
+            meet_names = response.xpath(
+                f'//div[contains(concat(" ", normalize-space(@class), " "), " panel-body ")]'
+                f'//table[.//tr/td[normalize-space(.)="{event}"]]//thead//a/text()'
+            ).getall()
+
+            if event_pr != [] and event_date != []:
+                for i in range(len(event_pr)):
+                    print(event + ":" + event_pr[i])
+                    event_date_new = dateHelper.convert_date(event_date[i])
+                    print(event + " date:" + event_date_new)
+                    print(meet_names[i])
             else:
                 raise ValueError(f"Athlete '{last_name}', '{first_name}' has no entry for event:'{event}'")

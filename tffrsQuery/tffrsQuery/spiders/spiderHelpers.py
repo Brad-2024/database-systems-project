@@ -1,3 +1,6 @@
+import re
+
+
 class stateAbbreviation():
     @staticmethod
     def get_state_abbreviation(state_name):
@@ -83,8 +86,17 @@ class dateHelper():
             "Nov": "11",
             "Dec": "12"
         }
-        date_str = date_str.replace(",", "")
-        date_parts = date_str.split(" ")
-        date_parts[0] = date_dict.get(date_parts[0])
-        date_str = date_parts[2] + "-" + date_parts[0] + "-" + date_parts[1]
-        return date_str
+        date_str = date_str.replace("\xa0", " ").replace(",", "").strip()
+        match = re.search(r'([A-Z][a-z]{2})\s+(\d{1,2})\s*(?:-\s*\d{1,2})?\s+(\d{4})', date_str)
+
+        if not match:
+            return ""
+
+        month_text = match.group(1)
+        start_day = match.group(2)
+        year = match.group(3)
+
+        month = date_dict[month_text]
+        day = start_day.zfill(2)
+
+        return f"{year}-{month}-{day}"
