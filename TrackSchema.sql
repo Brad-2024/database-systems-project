@@ -43,6 +43,7 @@ CREATE TABLE Athlete (
 	sex enum('M','F','U'), -- U = unspecified?
 	grad_year varchar(4), -- e.g., 2028
 	event varchar(150), -- e.g., "60 m, 100 m, long jump, pentathlon" --> not atomic but an athlete can have multiple events?
+    tffrs_url varchar(255),
     coach_id int,
 	trainer_id int,
     FOREIGN KEY (user_id) REFERENCES Users(id),
@@ -64,7 +65,7 @@ CREATE TABLE Meet (
 -- Create Race Table (weak entity).
 CREATE TABLE Race (
 	event varchar(20),
-	time time,
+	time DECIMAL(5,2),
 	meet_id int,
 	athlete_id int,
 	FOREIGN KEY (meet_id) REFERENCES Meet(id), -- Foreign Key to reference Meet Table for id
