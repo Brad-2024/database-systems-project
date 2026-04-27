@@ -7,7 +7,7 @@ requireLogin();
 requireRole(['coach']);
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    redirect('dashboard.php');
+    redirect('manage-athletes.php');
 }
 
 $userId = $_POST['user_id'] ?? '';
@@ -41,9 +41,9 @@ try {
 
     // Delete from role-specific table
     if ($role === 'athlete') {
-        $stmt = mysqli_prepare($connection, "DELETE FROM athletes WHERE user_id = ?");
+        $stmt = mysqli_prepare($connection, "DELETE FROM athlete WHERE user_id = ?");
     } elseif ($role === 'trainer') {
-        $stmt = mysqli_prepare($connection, "DELETE FROM trainers WHERE user_id = ?");
+        $stmt = mysqli_prepare($connection, "DELETE FROM trainer WHERE user_id = ?");
     } else {
         throw new Exception("Invalid role.");
     }
@@ -61,11 +61,11 @@ try {
     mysqli_commit($connection);
 
     setFlashData('success', 'User deleted successfully.');
-    redirect('dashboard.php');
+    redirect('manage-athletes.php');
 
 } catch (Exception $e) {
     mysqli_rollback($connection);
 
     setFlashData('error', $e->getMessage());
-    redirect('dashboard.php');
+    redirect('manage-athletes.php');
 }
