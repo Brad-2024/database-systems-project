@@ -21,7 +21,6 @@ $emailValue = $oldInput['email'] ?? '';
 <main class="page">
     <section class="card">
         <h1>Login</h1>
-        <p class="intro">Sign in with the demo account after you import the sample database.</p>
 
         <?php if ($loginError !== ''): ?>
             <div class="message error"><?php echo escape($loginError); ?></div>

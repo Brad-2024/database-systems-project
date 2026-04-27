@@ -57,7 +57,6 @@ if (mysqli_stmt_fetch($statement) && password_verify($password, $hashedPassword)
 
 mysqli_stmt_close($statement);
 
-// Keep the message generic so the form does not reveal which field failed.
 setFlashData('login_error', 'Invalid email or password');
 setFlashData('old_input', ['email' => $email]);
 redirect('login.php');
