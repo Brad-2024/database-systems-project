@@ -55,7 +55,6 @@ SELECT * FROM WeeklyTrainingDistance;
 -- training readiness indicator (red, orange, or green) based on recent data such as workouts, sleep, and soreness over 7–30 days
 -- avg workout success (7 days), active injuries, and avg daily calories (30 days)
 -- (in-progress)
-
 DROP VIEW IF EXISTS TrainingReadinessIndicator;
 
 CREATE VIEW TrainingReadinessIndicator AS
