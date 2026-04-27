@@ -25,7 +25,38 @@ $result = mysqli_query($connection, $query);
     <link rel="stylesheet" href="../css/main.css">
 </head>
 <body>
+<nav>
+    <ul>
+        <li><a href="index.php">Home</a></li>
+        <?php if ($userRole === 'coach'): ?>
+            <li class="current"><a href="manage-athletes.php">Manage Athletes</a></li>
+        <?php endif; ?>
+        <li><a href="logout.php">Log Out</a></li>
+    </ul>
+</nav>
 <main class="page">
+
+    <?php
+    $errors = getFlashData('errors', []);
+    $error = getFlashData('error');
+    $success = getFlashData('success');
+    ?>
+
+    <?php if ($success): ?>
+        <p class="success"><?php echo escape($success); ?></p>
+    <?php endif; ?>
+
+    <?php if ($error): ?>
+        <p class="error"><?php echo escape($error); ?></p>
+    <?php endif; ?>
+
+    <?php if (!empty($errors)): ?>
+        <ul class="error">
+            <?php foreach ($errors as $message): ?>
+                <li><?php echo escape($message); ?></li>
+            <?php endforeach; ?>
+        </ul>
+    <?php endif; ?>
 
     <form method="POST" action="add-user.php">
         <label for="role">Role:</label>
@@ -51,7 +82,7 @@ $result = mysqli_query($connection, $query);
         <!-- Athlete-only fields -->
         <div id="athlete-fields" style="display: none;">
             <label for="height">Height:</label>
-            <input type="number" name="height" id="height">
+            <input type="text" name="height" id="height">
 
             <label for="weight">Weight:</label>
             <input type="number" name="weight" id="weight">
@@ -83,7 +114,6 @@ $result = mysqli_query($connection, $query);
                 <option value="5000">5000</option>
                 <option value="100H">100H</option>
                 <option value="110H">110H</option>
-                <option value="300H">300H</option>
                 <option value="400H">400H</option>
                 <option value="HJ">High Jump</option>
                 <option value="LJ">Long Jump</option>
