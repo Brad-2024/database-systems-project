@@ -2,7 +2,6 @@
 
 -- ActiveInjuries: shows all athletes with active injuries alongside their injury type and occurrence date
 -- (complete)
-
 DROP VIEW IF EXISTS ActiveInjuries;
 
 CREATE VIEW ActiveInjuries AS
