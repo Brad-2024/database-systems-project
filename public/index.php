@@ -23,6 +23,7 @@ $userRole = $_SESSION['user_role'] ?? 'Role';
         <?php if ($userRole === 'coach'): ?>
             <li><a href="manage-athletes.php">Manage Athletes</a></li>
         <?php endif; ?>
+        <li><a href="account_details.php">Profile</a></li>
         <li><a href="logout.php">Log Out</a></li>
     </ul>
 </nav>

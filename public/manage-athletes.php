@@ -31,6 +31,7 @@ $result = mysqli_query($connection, $query);
         <?php if ($userRole === 'coach'): ?>
             <li class="current"><a href="manage-athletes.php">Manage Athletes</a></li>
         <?php endif; ?>
+        <li><a href="account_details.php">Profile</a></li>
         <li><a href="logout.php">Log Out</a></li>
     </ul>
 </nav>
