@@ -58,8 +58,6 @@ $emailValue = $oldInput['email'] ?? '';
 
             <button type="submit" class="button">Log In</button>
         </form>
-
-        <p class="note">Demo login: <strong>demo@example.com</strong> / <strong>password123</strong></p>
     </section>
 </main>
 </body>
