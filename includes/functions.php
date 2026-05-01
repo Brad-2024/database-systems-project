@@ -31,3 +31,10 @@ function escape($value)
 {
     return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
 }
+
+function calculateAge($dob){
+    $date = new DateTime($dob);
+    $now = new DateTime();
+    $interval = $now->diff($date);
+    return $interval->y;
+}
