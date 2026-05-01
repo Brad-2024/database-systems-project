@@ -222,7 +222,6 @@ if ($userRole == 'athlete') {
     const cancelButton = document.getElementById("cancel_button");
     const gradInput = document.getElementById("grad_year");
     const dobInput = document.getElementById("dob");
-    const originalDOB = dobInput.valueOf();
     const athleteForm = document.getElementById("athlete_form")
 
 
@@ -236,19 +235,29 @@ if ($userRole == 'athlete') {
         editSection.style.display = 'none';
     }
 
-    editButton.addEventListener('click', displayToEdit);
-    cancelButton.addEventListener('click', editToDisplay);
+    if (editButton) {
+        editButton.addEventListener('click', displayToEdit);
+    }
 
-    gradInput.addEventListener("input", () =>
-    {
-        gradInput.value = gradInput.value.replace(/\D/g, '');
-    })
+    if (cancelButton) {
+        cancelButton.addEventListener('click', editToDisplay);
+    }
 
-    athleteForm.addEventListener("submit", () => {
-        if (dobInput.value === originalDOB) {
-            dobInput.value = "";
-        }
-    })
+    if (gradInput) {
+        gradInput.addEventListener("input", () => {
+            gradInput.value = gradInput.value.replace(/\D/g, '');
+        });
+    }
+
+    if (dobInput && athleteForm) {
+        const originalDOB = dobInput.value;
+        
+        athleteForm.addEventListener("submit", () => {
+            if (dobInput.value === originalDOB) {
+                dobInput.value = "";
+            }
+        });
+    }
 
 </script>
 </body>
