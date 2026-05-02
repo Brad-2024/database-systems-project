@@ -124,6 +124,9 @@ $result = mysqli_query($connection, $query);
                 <option value="DT">Discus</option>
                 <option value="JT">Javelin</option>
             </select>
+
+            <label for="tffrs_url">TFFRS Url:</label>
+            <input type="text" name="tffrs_url" id="tffrs_url">
         </div>
 
         <!-- Coach/trainer-only fields -->
