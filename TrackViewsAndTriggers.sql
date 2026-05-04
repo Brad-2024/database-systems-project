@@ -1,7 +1,7 @@
 /* Views */
 
 -- ActiveInjuries: shows all athletes with active injuries alongside their injury type and occurrence date
--- (complete) --> fixed
+-- (finalized)
 DROP VIEW IF EXISTS ActiveInjuries;
 
 CREATE VIEW ActiveInjuries AS
@@ -16,16 +16,47 @@ ORDER BY last_name ASC;
 
 SELECT * FROM ActiveInjuries;
 
--- CurrentPerformanceTrends: shows each athlete's most recent race time per event compared to their personal best
--- (in-progress)
-DROP VIEW IF EXISTS CurrentPerformanceTrends;
+-- CurrentPerformanceTrendsPerEvent: shows each athlete's most recent race time per event
+-- (finalized)
+DROP VIEW IF EXISTS CurrentPerformanceTrendsPerEvent;
 
-CREATE VIEW CurrentPerformanceTrends AS
+CREATE VIEW CurrentPerformanceTrendsPerEvent AS
+SELECT athlete_id, first_name, last_name, performance.event, time AS most_recent_time
+FROM ((SELECT Race.athlete_id, Race.event, Race.time FROM Race JOIN 
+(SELECT athlete_id, event, MAX(Meet.date) AS most_recent_date FROM Race JOIN Meet
+ON Race.meet_id = Meet.id
+GROUP BY athlete_id, event) AS most_recent
+ON Race.athlete_id = most_recent.athlete_id AND Race.event = most_recent.event
+JOIN Meet ON Race.meet_id = Meet.id
+WHERE Meet.date = most_recent.most_recent_date) AS performance JOIN
+(SELECT Athlete.id, first_name, last_name FROM
+(SELECT id, first_name, last_name FROM Users
+WHERE role = 'athlete') AS users JOIN Athlete
+ON users.id = Athlete.user_id) AS athletes
+ON performance.athlete_id = athletes.id) AS performance_with_athletes
+ORDER BY last_name ASC;
 
-SELECT * FROM CurrentPerformanceTrends;
+SELECT * FROM CurrentPerformanceTrendsPerEvent;
+
+-- BestPerformanceTrendsPerEvent: shows each athlete's best race time per event
+-- (finalized)
+DROP VIEW IF EXISTS BestPerformanceTrendsPerEvent;
+
+CREATE VIEW BestPerformanceTrendsPerEvent AS
+SELECT athlete_id, first_name, last_name, performance.event, time AS best_time
+FROM ((SELECT Race.athlete_id, Race.event, MIN(Race.time) AS time FROM Race
+GROUP BY Race.athlete_id, Race.event) AS performance JOIN
+(SELECT Athlete.id, first_name, last_name FROM
+(SELECT id, first_name, last_name FROM Users
+WHERE role = 'athlete') AS users JOIN Athlete
+ON users.id = Athlete.user_id) AS athletes
+ON performance.athlete_id = athletes.id) AS performance_with_athletes
+ORDER BY last_name ASC;
+
+SELECT * FROM BestPerformanceTrendsPerEvent;
 
 -- WeeklyTrainingSuccessScore: shows each athlete's average workout success score over past 7 days
--- (complete) --> fixed
+-- (finalized)
 DROP VIEW IF EXISTS WeeklyTrainingSuccessScore;
 
 CREATE VIEW WeeklyTrainingSuccessScore AS
@@ -43,7 +74,7 @@ ORDER BY average_success_score DESC;
 SELECT * FROM WeeklyTrainingSuccessScore;
 
 -- WeeklyTrainingDistance: shows each athlete's average distance over the past 7 days
--- (complete) --> fixed
+-- (finalized)
 DROP VIEW IF EXISTS WeeklyTrainingDistance; 
 
 CREATE VIEW WeeklyTrainingDistance AS
@@ -62,6 +93,7 @@ ORDER BY average_distance DESC;
 
 SELECT * FROM WeeklyTrainingDistance;
 
+-- -------------------------------------------------------------------------------------------------
 -- training readiness indicator (red, orange, or green) based on recent data such as workouts, sleep, and soreness over 7–30 days
 -- avg workout success (7 days), active injuries, and avg daily calories (30 days)
 -- (in-progress)
