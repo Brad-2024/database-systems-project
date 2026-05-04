@@ -1,14 +1,16 @@
 /* Views */
 
 -- ActiveInjuries: shows all athletes with active injuries alongside their injury type and occurrence date
--- (complete)
+-- (complete) --> fixed
 DROP VIEW IF EXISTS ActiveInjuries;
 
 CREATE VIEW ActiveInjuries AS
 SELECT id, first_name, last_name, type, occurence_date FROM 
-((SELECT id, first_name, last_name FROM Users
-WHERE role = 'athlete') AS athletes JOIN Injury
-ON athletes.id = Injury.athlete_id) AS athlete_injuries
+((SELECT Athlete.id, first_name, last_name FROM
+(SELECT id, first_name, last_name FROM Users
+WHERE role = 'athlete') AS users JOIN Athlete
+ON users.id = Athlete.user_id) as athletes JOIN Injury
+ON athletes.id = Injury.athlete_id) as athlete_injuries
 WHERE active = 'Y'
 ORDER BY last_name ASC;
 
@@ -23,29 +25,37 @@ CREATE VIEW CurrentPerformanceTrends AS
 SELECT * FROM CurrentPerformanceTrends;
 
 -- WeeklyTrainingSuccessScore: shows each athlete's average workout success score over past 7 days
--- (complete)
+-- (complete) --> fixed
 DROP VIEW IF EXISTS WeeklyTrainingSuccessScore;
 
 CREATE VIEW WeeklyTrainingSuccessScore AS
 SELECT athlete_id, first_name, last_name, average_success_score 
-FROM ((SELECT athlete_id, (SUM(workout_success)/7) AS average_success_score FROM Workout 
+FROM ((SELECT athlete_id, SUM(workout_success)/7 AS average_success_score FROM Workout 
 WHERE `date` >= CURDATE() - INTERVAL 7 DAY
-GROUP BY athlete_id) AS average JOIN Users 
-ON athlete_id = Users.id) AS athlete_and_average
+GROUP BY athlete_id) AS average JOIN 
+(SELECT Athlete.id, first_name, last_name FROM
+(SELECT id, first_name, last_name FROM Users
+WHERE role = 'athlete') AS users JOIN Athlete
+ON users.id = Athlete.user_id) as athletes
+ON average.athlete_id = athletes.id) AS athletes_and_averages
 ORDER BY average_success_score DESC;
 
 SELECT * FROM WeeklyTrainingSuccessScore;
 
 -- WeeklyTrainingDistance: shows each athlete's average distance over the past 7 days
--- (complete)
+-- (complete) --> fixed
 DROP VIEW IF EXISTS WeeklyTrainingDistance; 
 
 CREATE VIEW WeeklyTrainingDistance AS
 SELECT athlete_id, first_name, last_name, SUM(distance)/7 AS average_distance FROM 
 (SELECT wt_id, athlete_id, first_name, last_name, distance
 FROM ((SELECT id AS wt_id, athlete_id FROM Workout
-WHERE `date` >= CURDATE() - INTERVAL 7 DAY) AS workouts JOIN Users 
-ON athlete_id = Users.id) AS workouts_with_athletes JOIN Workout_Set
+WHERE `date` >= CURDATE() - INTERVAL 7 DAY) AS workouts JOIN 
+(SELECT Athlete.id, first_name, last_name FROM
+(SELECT id, first_name, last_name FROM Users
+WHERE role = 'athlete') AS users JOIN Athlete
+ON users.id = Athlete.user_id) as athletes 
+ON workouts.athlete_id = athletes.id) AS workouts_with_athletes JOIN Workout_Set
 ON wt_id = workout_id) AS workout_sets
 GROUP BY athlete_id
 ORDER BY average_distance DESC;
