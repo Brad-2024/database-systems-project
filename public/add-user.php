@@ -22,6 +22,7 @@ $dob = trim($_POST['dob'] ?? '');
 $sex = $_POST['sex'] ?? '';
 $gradYear = trim($_POST['grad_year'] ?? '');
 $event = $_POST['event'] ?? '';
+$tffrs_url = $_POST['tffrs_url'] ?? '';
 
 $phoneNumber = trim($_POST['phone_number'] ?? '');
 
@@ -66,6 +67,10 @@ if ($role === 'athlete') {
 
     if ($event === '') {
         $errors['event'] = 'Event is required.';
+    }
+
+    if ($tffrs_url === '') {
+        $errors['tffrs_url'] = 'Event is required.';
     }
 }
 
@@ -121,8 +126,8 @@ try {
     if ($role === 'athlete') {
         $query = "
             INSERT INTO athlete
-            (user_id, height, weight, dob, sex, grad_year, event)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            (user_id, height, weight, dob, sex, grad_year, event, tffrs_url)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         ";
 
         $stmt = mysqli_prepare($connection, $query);
@@ -133,14 +138,15 @@ try {
 
         mysqli_stmt_bind_param(
             $stmt,
-            'isissss',
+            'isisssss',
             $userId,
             $height,
             $weight,
             $dob,
             $sex,
             $gradYear,
-            $event
+            $event,
+            $tffrs_url
         );
 
     } elseif ($role === 'coach') {

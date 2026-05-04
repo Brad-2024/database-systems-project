@@ -251,7 +251,7 @@ if ($userRole == 'athlete') {
 
     if (dobInput && athleteForm) {
         const originalDOB = dobInput.value;
-        
+
         athleteForm.addEventListener("submit", () => {
             if (dobInput.value === originalDOB) {
                 dobInput.value = "";
