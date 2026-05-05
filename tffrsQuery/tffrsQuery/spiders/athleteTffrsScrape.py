@@ -58,7 +58,8 @@ class AthletetffrsscrapeSpider(scrapy.Spider):
                 continue
 
             insert_date = dateHelper.convert_date(event_date.strip())
-            meet_id = checkMeetTable(meet_name.strip(), insert_date, self.cursor)
+            insert_meet_name = clean_text(meet_name)
+            meet_id = checkMeetTable(insert_meet_name, insert_date, self.cursor)
 
             rows = table.xpath(f'.//tr[td[normalize-space(.)="{event}"]]')
 
@@ -103,11 +104,12 @@ def checkRace(cursor, params):
 
 def insertMeet(cursor, params):
     sql_db = "INSERT INTO Meet (date, name) VALUES (%s, %s)"
-    cursor.execute(sql_db, (params['date'], params['name']))
+    cursor.execute(sql_db, (params['date'], clean_text(params['name'])))
     meet_id = cursor.lastrowid
     return meet_id
 
 def checkMeetTable(meet_name, meet_date, cursor):
+    meet_name = clean_text(meet_name)
     sql_db = "SELECT id FROM Meet WHERE name = %s AND date = %s"
     cursor.execute(sql_db, (meet_name, meet_date))
     result = cursor.fetchone()
