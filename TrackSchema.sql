@@ -57,20 +57,20 @@ CREATE TABLE Meet (
 	id int NOT NULL AUTO_INCREMENT,
 	date date,
 	name varchar(50),
-	city varchar(50),
-	state varchar(2),
 	PRIMARY KEY (id) -- Primary Key for Meet Table
 );
 
 -- Create Race Table (weak entity).
 CREATE TABLE Race (
+    id int NOT NULL AUTO_INCREMENT,
 	event varchar(20),
-	time DECIMAL(5,2),
+	time VARCHAR(30),
+    round VARCHAR(20),
 	meet_id int,
 	athlete_id int,
 	FOREIGN KEY (meet_id) REFERENCES Meet(id), -- Foreign Key to reference Meet Table for id
 	FOREIGN KEY (athlete_id) REFERENCES Athlete(id), -- Foreign Key to reference Athlete Table for id
-	PRIMARY KEY (meet_id, athlete_id, event) -- Primary Key for Race Table
+	PRIMARY KEY (id) -- Primary Key for Race Table
 );
 
 -- Create Injury Table with incrementing ID.
