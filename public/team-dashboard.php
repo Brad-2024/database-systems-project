@@ -3,7 +3,7 @@
 require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../config/database.php';
 
-requireLogin();
+requireRole(['coach']);
 
 $userName = $_SESSION['user_name'] ?? 'User';
 $userRole = $_SESSION['user_role'] ?? 'Role';
