@@ -1,3 +1,5 @@
+import re
+
 import scrapy
 import mysql.connector
 from .spiderHelpers import dateHelper
@@ -8,56 +10,116 @@ class AthletetffrsscrapeSpider(scrapy.Spider):
     allowed_domains = ["www.tfrrs.org"]
     start_urls = ["https://www.tfrrs.org"]
 
-    async def start(self):
-        urls = []
-        for url in urls:
-            yield scrapy.Request(url=url, callback=self.feed,
-                                 meta={"event": event, "first_name": first_name, "last_name": last_name})
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.cnx = mysql.connector.connect(
+            user="root",
+            password="Ninjaman2006",
+            host="localhost",
+            database="Track"
+        )
+        self.cursor = self.cnx.cursor()
 
-        cnx = mysql.connector.connection(user='root', password='', host='localhost')
-        cursor = cnx.cursor()
+    def closed(self, reason):
+        self.cnx.commit()
+        self.cursor.close()
+        self.cnx.close()
+
+    async def start(self):
+        urls_sql = "SELECT tffrs_url, event, id FROM Athlete WHERE tffrs_url IS NOT NULL"
+        self.cursor.execute(urls_sql)
+        athletes = self.cursor.fetchall()
+        for athlete in athletes:
+            url = athlete[0]
+            event = athlete[1]
+            athlete_id = athlete[2]
+            yield scrapy.Request(url=url, callback=self.parse,
+                                 meta={"event": event, "athlete_id": athlete_id})
 
     def parse(self, response):
         event = response.meta["event"]
-        first_name = response.meta["first_name"]
-        last_name = response.meta["last_name"]
-        events = response.xpath(
+        athlete_id = response.meta["athlete_id"]
+        found_any = False
+
+        tables = response.xpath(
             f'//div[contains(concat(" ", normalize-space(@class), " "), " panel-body ")]'
-            f'//table//tr/td[normalize-space(.)="{event}"]/following-sibling::td[1]//a/text()'
-        ).getall()
+            f'//table[.//tr/td[normalize-space(.)="{event}"]]'
+        )
 
-        event_dates = response.xpath(
-            f'//div[contains(concat(" ", normalize-space(@class), " "), " panel-body ")]'
-            f'//table[.//tr/td[normalize-space(.)="{event}"]]//thead//span/text()'
-        ).getall()
+        if not tables:
+            self.logger.info(f"No tables found for athlete ID {athlete_id} and event {event}.")
+            return
 
-        meet_names = response.xpath(
-            f'//div[contains(concat(" ", normalize-space(@class), " "), " panel-body ")]'
-            f'//table[.//tr/td[normalize-space(.)="{event}"]]//thead//a/text()'
-        ).getall()
+        for table in tables:
+            event_date = table.xpath('.//thead//span/text()').get()
+            meet_name = table.xpath('.//thead//a/text()').get()
 
-        if events != [] and event_dates != []:
-            for i in range(len(events)):
-                insert_event = events[i]
-                insert_date = dateHelper.convert_date(event_dates[i])
+            if not event_date or not meet_name:
+                continue
 
-        else:
-            raise ValueError(f"Athlete '{last_name}', '{first_name}' has no entry for event:'{event}'")
+            insert_date = dateHelper.convert_date(event_date.strip())
+            meet_id = checkMeetTable(meet_name.strip(), insert_date, self.cursor)
 
+            rows = table.xpath(f'.//tr[td[normalize-space(.)="{event}"]]')
+
+            for row in rows:
+                race_time = row.xpath('./td[2]//a/text()').get()
+
+                if not race_time:
+                    continue
+
+                round_text = row.xpath('normalize-space(./td[3])').get()
+                round_match = re.search(r'\(([^)]+)\)', round_text)
+                race_round = round_match.group(1) if round_match else None
+
+                race_attributes = {
+                    'event': event,
+                    'time': race_time.strip(),
+                    'meet_id': meet_id,
+                    'athlete_id': athlete_id,
+                    'round': race_round
+                }
+
+                checkRace(self.cursor, race_attributes)
+                found_any = True
+
+        self.cnx.commit()
+
+        if not found_any:
+            self.logger.info(f"No race rows found for athlete ID {athlete_id} and event {event}.")
 
 def insertRace(cursor, params):
-    sql_db = "INSERT INTO Race (event, time, meet_id, athlete_id) VALUES (%s, %s, %s, %s, %s)"
-    cursor.execute(sql_db, (params['event'], params['time'], params['meet_id'], params['athlete_id']))
+    sql_db = "INSERT INTO Race (event, time, meet_id, athlete_id, round) VALUES (%s, %s, %s, %s, %s)"
+    cursor.execute(sql_db, (params['event'], params['time'], params['meet_id'], params['athlete_id'], params['round']))
+
+def checkRace(cursor, params):
+    sql_db = "SeLECT id FROM Race WHERE event = %s AND time = %s AND meet_id = %s AND athlete_id = %s AND round = %s"
+    cursor.execute(sql_db, (params['event'], params['time'], params['meet_id'], params['athlete_id'], params['round']))
+    result = cursor.fetchone()
+    if result:
+        return
+    else:
+        insertRace(cursor, params)
 
 def insertMeet(cursor, params):
-    sql_db = "INSERT INTO Meet (date, name, city, state) VALUES (%s, %s, %s, %s)"
-    cursor.execute(sql_db, (params['date'], params['name'], params['city'], params['state']))
-
-def checkMeetTable(meet_name, meet_date):
-    meet_id = 0
+    sql_db = "INSERT INTO Meet (date, name) VALUES (%s, %s)"
+    cursor.execute(sql_db, (params['date'], params['name']))
+    meet_id = cursor.lastrowid
     return meet_id
 
-def insertMeetTable(meet_name, meet_date):
-    return
+def checkMeetTable(meet_name, meet_date, cursor):
+    sql_db = "SELECT id FROM Meet WHERE name = %s AND date = %s"
+    cursor.execute(sql_db, (meet_name, meet_date))
+    result = cursor.fetchone()
+
+    if result:
+        meet_id = result[0]
+    else:
+        meet_attributes = {
+            'date' : meet_date,
+            'name' : meet_name
+        }
+        meet_id = insertMeet(cursor, meet_attributes)
+    return meet_id
 
 
