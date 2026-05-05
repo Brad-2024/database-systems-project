@@ -46,6 +46,7 @@ CREATE TABLE Athlete (
     tffrs_url varchar(255),
     coach_id int,
 	trainer_id int,
+	training_readiness_indicator enum('R', 'O', 'G'), -- R = Red, O = Orange, G = Green
     FOREIGN KEY (user_id) REFERENCES Users(id),
 	FOREIGN KEY (coach_id) REFERENCES Coach(id), -- Foreign Key to reference Coach Table for id
 	FOREIGN KEY (trainer_id) REFERENCES Trainer(id), -- Foreign Key to reference Trainer Table for id
