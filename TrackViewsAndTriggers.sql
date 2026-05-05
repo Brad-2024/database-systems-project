@@ -1,7 +1,7 @@
-/* Views */
+/* Views --> remember to query this in the database to create the views 
+(also, views must be updated regularly to prevent stale data)*/
 
 -- ActiveInjuries: shows all athletes with active injuries alongside their injury type and occurrence date
--- (finalized)
 DROP VIEW IF EXISTS ActiveInjuries;
 
 CREATE VIEW ActiveInjuries AS
@@ -17,7 +17,6 @@ ORDER BY last_name ASC;
 SELECT * FROM ActiveInjuries;
 
 -- CurrentPerformanceTrendsPerEvent: shows each athlete's most recent race time per event
--- (finalized)
 DROP VIEW IF EXISTS CurrentPerformanceTrendsPerEvent;
 
 CREATE VIEW CurrentPerformanceTrendsPerEvent AS
@@ -39,7 +38,6 @@ ORDER BY last_name ASC;
 SELECT * FROM CurrentPerformanceTrendsPerEvent;
 
 -- BestPerformanceTrendsPerEvent: shows each athlete's best race time per event
--- (finalized)
 DROP VIEW IF EXISTS BestPerformanceTrendsPerEvent;
 
 CREATE VIEW BestPerformanceTrendsPerEvent AS
@@ -56,7 +54,6 @@ ORDER BY last_name ASC;
 SELECT * FROM BestPerformanceTrendsPerEvent;
 
 -- WeeklyTrainingSuccessScore: shows each athlete's average workout success score over past 7 days
--- (finalized)
 DROP VIEW IF EXISTS WeeklyTrainingSuccessScore;
 
 CREATE VIEW WeeklyTrainingSuccessScore AS
@@ -74,7 +71,6 @@ ORDER BY average_success_score DESC;
 SELECT * FROM WeeklyTrainingSuccessScore;
 
 -- WeeklyTrainingDistance: shows each athlete's average distance over the past 7 days
--- (finalized)
 DROP VIEW IF EXISTS WeeklyTrainingDistance; 
 
 CREATE VIEW WeeklyTrainingDistance AS
@@ -93,7 +89,6 @@ ORDER BY average_distance DESC;
 
 SELECT * FROM WeeklyTrainingDistance;
 
--- -------------------------------------------------------------------------------------------------
 -- training readiness indicator (red, orange, or green) based on recent data such as workouts, sleep, and soreness over 7–30 days
 -- avg workout success (7 days), active injuries, and avg daily calories (30 days)
 -- (in-progress)
@@ -103,27 +98,4 @@ CREATE VIEW TrainingReadinessIndicator AS
 
 SELECT * FROM TrainingReadinessIndicator;
 
-/* Triggers */
-
--- example
-
-DROP TRIGGER IF EXISTS onInsertionPlayer;
-DELIMITER //
-CREATE TRIGGER onInsertionPlayer BEFORE INSERT ON player
-FOR EACH ROW
-BEGIN
-	IF NEW.ioc IN ("RUS", "EST") THEN
-	SET NEW.ioc = "USR";
-	END IF;
-END
-//
-DELIMITER ;
-
-INSERT INTO player (name, dob, hand, height, ioc) VALUES ("Joe Bob", "1991-01-01", "L", 182, "RUS");
-SELECT * FROM player WHERE name = "Joe Bob";
-
--- calorie max ping for coaches
-
--- updating an athlete’s personal record when a meet result beats their current PR
-
--- flagging an athlete if soreness levels exceed 7 for several consecutive days
+/* Triggers? */
