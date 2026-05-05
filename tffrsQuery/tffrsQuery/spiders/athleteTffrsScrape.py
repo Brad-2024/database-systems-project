@@ -122,4 +122,10 @@ def checkMeetTable(meet_name, meet_date, cursor):
         meet_id = insertMeet(cursor, meet_attributes)
     return meet_id
 
+def clean_text(value):
+    if value is None:
+        return None
+    value = value.replace("\xa0", " ")
+    return re.sub(r"\s+", " ", value).strip()
+
 
