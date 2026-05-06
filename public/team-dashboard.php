@@ -12,6 +12,10 @@ $userID = $_SESSION['user_id'] ?? -1;
 
 $connection = getDatabaseConnection();
 
+$query_num_athlete = "SELECT COUNT(*) AS num_athletes FROM users WHERE role = 'athlete'";
+$result_num_athlete = mysqli_query($connection, $query_num_athlete);
+$num_athlete = mysqli_fetch_assoc($result_num_athlete);
+
 //Views 
 
 //ActiveInjuries
@@ -63,7 +67,7 @@ foreach ($current_rows as $row) {
 }
 
 //summary counts
-$total_athletes  = count($success_scores);
+$total_athletes  = $num_athlete['num_athletes'] ?? 0;
 $total_injuries  = count($injuries);
 $avg_success     = $total_athletes > 0
     ? round(array_sum(array_column($success_scores, 'average_success_score')) / $total_athletes, 1)
@@ -242,7 +246,6 @@ $distance_json      = json_encode($distances);
 </head>
 <body>
 
-<?php include __DIR__ . '/../includes/nav.php'; ?>
 <?php require_once __DIR__ . '/../includes/nav.php'; ?>
 
 <div class="container">
