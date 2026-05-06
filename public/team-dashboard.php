@@ -243,6 +243,7 @@ $distance_json      = json_encode($distances);
 <body>
 
 <?php include __DIR__ . '/../includes/nav.php'; ?>
+<?php require_once __DIR__ . '/../includes/nav.php'; ?>
 
 <div class="container">
 

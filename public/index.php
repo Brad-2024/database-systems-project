@@ -17,16 +17,7 @@ $userRole = $_SESSION['user_role'] ?? 'Role';
     <link rel="stylesheet" href="../css/main.css">
 </head>
 <body>
-<nav>
-    <ul>
-        <li class="current"><a href="index.php">Home</a></li>
-        <?php if ($userRole === 'coach'): ?>
-            <li><a href="manage-athletes.php">Manage Athletes</a></li>
-        <?php endif; ?>
-        <li><a href="account_details.php">Profile</a></li>
-        <li><a href="logout.php">Log Out</a></li>
-    </ul>
-</nav>
+<?php require_once __DIR__ . '/../includes/nav.php'; ?>
 <main class="page">
     <section class="card">
         <h1>Dashboard</h1>
