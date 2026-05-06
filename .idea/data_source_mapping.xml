@@ -2,5 +2,6 @@
 <project version="4">
   <component name="DataSourcePerFileMappings">
     <file url="file://$PROJECT_DIR$/TrackSchema.sql" value="4e5cad2d-9ec8-42f9-a215-419fee5ad909" />
+    <file url="file://$PROJECT_DIR$/TrackViewsAndTriggers.sql" value="4e5cad2d-9ec8-42f9-a215-419fee5ad909" />
   </component>
 </project>
