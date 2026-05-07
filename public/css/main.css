@@ -9,16 +9,24 @@ body {
 
 .login-page {
     display: flex;
+    min-height: 100vh;
     justify-content: center;
     align-items: center;
-    min-height: 100vh;
+
+    background-image: url(../images/login-bg.png);
+    background-size: 90% auto;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
 .login-card {
     width: 30%;
     padding: 15px;
-    border: 1px solid black;
+    border: 1px;
     border-radius: 5px;
+    background: rgba(255, 255, 255, 0.28);
+    backdrop-filter: blur(18px) saturate(1.25);
+    -webkit-backdrop-filter: blur(18px) saturate(1.25);
     box-shadow: 0 0 5px 5px rgba(152, 148, 148, 0.208);
 }
 
@@ -35,7 +43,7 @@ body {
     width: 100%;
     margin-top: 10px;
     border: 1.5px solid black;
-    border-radius: 5px;
+    border-radius: 10px;
     transition: 0.5s ease, transform 0.2s ease;
 }
 
@@ -45,23 +53,18 @@ body {
 
 }
 
-#email {
+.button:active {
+    background-color: rgb(241, 93, 93);
+    transform: translateY(1.5px);
+    transition: 0.2s ease;
+}
+
+#email, #password {
     border: 1.5px solid black;
     transition: 0.5s ease, transform 0.2s ease;
 }
 
-#password {
-    border: 1.5px solid black;
-    transition: 0.5s ease, transform 0.2s ease;
-}
-
-#email:hover {
-    background-color: rgb(255, 179, 179);
-    transform: translateY(-1.5px);
-}
-
-
-#password:hover {
+#email:hover, #password:hover{
     background-color: rgb(255, 179, 179);
     transform: translateY(-1.5px);
 }
