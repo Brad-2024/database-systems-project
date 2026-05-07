@@ -43,6 +43,11 @@ $query_current = "SELECT athlete_id, first_name, last_name, event, most_recent_t
 $result_current = mysqli_query($connection, $query_current);
 $current_rows = mysqli_fetch_all($result_current, MYSQLI_ASSOC);
 
+//TrainingReadinessIndicator
+$query_readiness = "SELECT athlete_id, first_name, last_name, avg_workout_success_7_days, active_injuries, avg_daily_calories_30_days, training_readiness_indicator FROM TrainingReadinessIndicator";
+$result_readiness = mysqli_query($connection, $query_readiness);
+$readiness_rows = mysqli_fetch_all($result_readiness, MYSQLI_ASSOC);
+
 //build a lookup: [athlete_id][event] => best_time
 $best_lookup = [];
 foreach ($best_rows as $row) {
@@ -52,34 +57,48 @@ foreach ($best_rows as $row) {
 //build per-event delta data: event => [ {name, delta} ]
 $event_deltas = [];
 foreach ($current_rows as $row) {
-    $aid   = $row['athlete_id'];
+    $aid = $row['athlete_id'];
     $event = $row['event'];
     $current_time = (float)$row['most_recent_time'];
-    $best_time    = $best_lookup[$aid][$event] ?? null;
+    $best_time = $best_lookup[$aid][$event] ?? null;
 
     if ($best_time !== null) {
         $delta = round($current_time - $best_time, 2);
         $event_deltas[$event][] = [
-            'name'  => $row['last_name'] . ', ' . substr($row['first_name'], 0, 1) . '.',
+            'name' => $row['last_name'] . ', ' . substr($row['first_name'], 0, 1) . '.',
             'delta' => $delta
         ];
     }
 }
 
 //summary counts
-$total_athletes  = $num_athlete['num_athletes'] ?? 0;
-$total_injuries  = count($injuries);
-$avg_success     = $total_athletes > 0
+$total_athletes = $num_athlete['num_athletes'] ?? 0;
+$total_injuries = count($injuries);
+$avg_success = $total_athletes > 0
     ? round(array_sum(array_column($success_scores, 'average_success_score')) / $total_athletes, 1)
     : 0;
-$avg_distance    = count($distances) > 0
+$avg_distance = count($distances) > 0
     ? round(array_sum(array_column($distances, 'average_distance')) / count($distances), 1)
     : 0;
+$readiness_counts = [
+    'R' => 0,
+    'O' => 0,
+    'G' => 0
+];
+
+foreach ($readiness_rows as $row) {
+    $indicator = $row['training_readiness_indicator'];
+
+    if (isset($readiness_counts[$indicator])) {
+        $readiness_counts[$indicator]++;
+    }
+}
 
 //JSON for JS
-$event_deltas_json  = json_encode($event_deltas);
-$success_json       = json_encode($success_scores);
-$distance_json      = json_encode($distances);
+$event_deltas_json = json_encode($event_deltas);
+$success_json = json_encode($success_scores);
+$distance_json = json_encode($distances);
+$readiness_json = json_encode($readiness_counts);
 
 ?>
 <!DOCTYPE html>
@@ -343,12 +362,28 @@ $distance_json      = json_encode($distances);
         <?php endif; ?>
     </div>
 
-</div><!-- /.container -->
+    <!-- Training Readiness Indicator -->
+    <div class="chart-panel">
+        <h3>Training readiness indicator</h3>
+        <p class="chart-desc">Team readiness based on active injuries, 7-day workout success, and 30-day average daily calories</p>
+
+        <div class="chart-legend">
+            <span><span class="leg-dot" style="background:#e24b4a;"></span>Red</span>
+            <span><span class="leg-dot" style="background:#ef9f27;"></span>Orange</span>
+            <span><span class="leg-dot" style="background:#5dcaa5;"></span>Green</span>
+        </div>
+
+        <div style="position:relative;width:100%;height:320px;">
+            <canvas id="readinessChart"></canvas>
+        </div>
+    </div>
+</div>
 
 <script>
-const eventDeltas  = <?= $event_deltas_json ?>;
-const successData  = <?= $success_json ?>;
+const eventDeltas = <?= $event_deltas_json ?>;
+const successData = <?= $success_json ?>;
 const distanceData = <?= $distance_json ?>;
+const readinessData = <?= $readiness_json ?>;
 
 // --- Best vs. Current: Delta Chart ---
 let timeDeltaChart;
@@ -496,6 +531,39 @@ new Chart(document.getElementById('distanceChart'), {
             y: {
                 grid: { display: false },
                 ticks: { font: { size: 11 }, color: '#888' }
+            }
+        }
+    }
+});
+
+//Training Readiness Indicator
+const readinessLabels = ['Red', 'Orange', 'Green'];
+const readinessValues = [
+    readinessData.R || 0,
+    readinessData.O || 0,
+    readinessData.G || 0
+];
+
+new Chart(document.getElementById('readinessChart'), {
+    type: 'doughnut',
+    data: {
+        labels: readinessLabels,
+        datasets: [{
+            label: 'Athletes',
+            data: readinessValues,
+            backgroundColor: ['#e24b4a', '#ef9f27', '#5dcaa5'],
+            borderWidth: 0
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: { display: false },
+            tooltip: {
+                callbacks: {
+                    label: ctx => ctx.label + ': ' + ctx.raw + ' athlete' + (ctx.raw === 1 ? '' : 's')
+                }
             }
         }
     }
