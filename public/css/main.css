@@ -47,10 +47,9 @@ body {
     transition: 0.5s ease, transform 0.2s ease;
 }
 
-.button:hover {
+.button:hover, #email:hover, #password:hover{
     background-color: rgb(255, 195, 195);
     transform: translateY(-1.5px);
-
 }
 
 .button:active {
@@ -62,9 +61,4 @@ body {
 #email, #password {
     border: 1.5px solid black;
     transition: 0.5s ease, transform 0.2s ease;
-}
-
-#email:hover, #password:hover{
-    background-color: rgb(255, 195, 195);
-    transform: translateY(-1.5px);
 }
