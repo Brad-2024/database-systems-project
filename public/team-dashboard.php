@@ -4,7 +4,7 @@ require_once __DIR__ . '/../includes/auth.php';
 require_once __DIR__ . '/../config/database.php';
 
 requireLogin();
-requireRole(['coach']);
+requireRole(['coach', 'athlete']);
 
 $userName = $_SESSION['user_name'] ?? 'User';
 $userRole = $_SESSION['user_role'] ?? 'Role';
@@ -119,6 +119,7 @@ $readiness_json = json_encode($readiness_counts);
     <h2>Team Dashboard</h2>
     <p class="page-subtitle">Weekly overview — training, performance, and injury status</p>
 
+    <?php if ($userRole === 'coach'): ?>
     <!-- Summary Cards -->
     <div class="dashboard-grid">
         <div class="summary-card">
@@ -171,7 +172,7 @@ $readiness_json = json_encode($readiness_counts);
         </div>
         <div class="chart-panel">
             <h3>Weekly training distance</h3>
-            <p class="chart-desc">Average daily miles over 7 days</p>
+            <p class="chart-desc">Average daily meters over 7 days</p>
             <div style="position:relative;width:100%;height:320px;">
                 <canvas id="distanceChart"></canvas>
             </div>
@@ -224,6 +225,176 @@ $readiness_json = json_encode($readiness_counts);
             <canvas id="readinessChart"></canvas>
         </div>
     </div>
+    <?php endif; ?>
+
+    <?php if ($userRole === 'athlete'): ?>
+    <div>
+        <form method="POST" action="add-workout.php">
+            <h1>Add Workout:</h1>
+            <table>
+                <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Workout Success</th>
+                </tr>
+                </thead>
+                <tbody>
+                <td>
+                    <input
+                            type="date"
+                            name="date"
+                            required
+                    >
+                </td>
+                <td>
+                    <input
+                            type="number"
+                            max="10"
+                            min="0"
+                            name="workout_success"
+                            required
+                    >
+                </td>
+                </tbody>
+            </table>
+            <table id="workoutTable">
+                <thead>
+                <tr>
+                    <th>Set #</th>
+                    <th>Distance</th>
+                    <th>Time</th>
+                    <th>Remove</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                <tr>
+                    <td>1</td>
+
+                    <td>
+                        <input
+                                type="number"
+                                name="distance[]"
+                                placeholder="400"
+                                required
+                        >
+                    </td>
+
+                    <td>
+                        <input
+                                type="number"
+                                name="time[]"
+                                placeholder="60"
+                                required
+                        >
+                    </td>
+
+                    <td>
+                        <button
+                                type="button"
+                                class="delete-btn"
+                                onclick="deleteRow(this)"
+                        >
+                            X
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <button type="button" onclick="addRow()">
+                Add Set
+            </button>
+
+            <button type="submit">
+                Submit Workout
+            </button>
+
+        </form>
+    </div>
+
+    <div>
+        <form method="POST" action="add-meal.php">
+            <h1>Add Meal:</h1>
+            <table>
+                <thead>
+                <tr>
+                    <th>Meal Type</th>
+                    <th>Date</th>
+                    <th>Calories</th>
+                    <th>Fats</th>
+                    <th>Carbs</th>
+                    <th>Sugars</th>
+                    <th>Protein</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>
+                        <select name="meal_type" required>
+                            <option value="">-- Select Meal Type --</option>
+                            <option value="breakfast">Breakfast</option>
+                            <option value="lunch">Lunch</option>
+                            <option value="dinner">Dinner</option>
+                            <option value="snack">Snack</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input
+                                type="date"
+                                name="date"
+                                required
+                        >
+                    </td>
+                    <td>
+                        <input
+                                type="number"
+                                name="calories"
+                                placeholder="500"
+                                required
+                        >
+                    </td>
+                    <td>
+                        <input
+                                type="number"
+                                name="fats"
+                                placeholder="20"
+                                required
+                        >
+                    </td>
+                    <td>
+                        <input
+                                type="number"
+                                name="carbs"
+                                placeholder="50"
+                                required
+                        >
+                    </td>
+                    <td>
+                        <input
+                                type="number"
+                                name="sugars"
+                                placeholder="10"
+                                required
+                        >
+                    </td>
+                    <td>
+                        <input
+                                type="number"
+                                name="protein"
+                                placeholder="30"
+                                required
+                        >
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <button type="submit">
+                    Submit Meal
+            </button>
+        </form>
+    </div>
+    <?php endif; ?>
 </div>
 
 <script>
@@ -367,7 +538,7 @@ new Chart(document.getElementById('distanceChart'), {
         maintainAspectRatio: false,
         plugins: {
             legend: { display: false },
-            tooltip: { callbacks: { label: ctx => ctx.raw.toFixed(1) + ' mi/day' } }
+            tooltip: { callbacks: { label: ctx => ctx.raw.toFixed(1) + ' m/day' } }
         },
         scales: {
             x: {
@@ -415,6 +586,61 @@ new Chart(document.getElementById('readinessChart'), {
         }
     }
 });
+
+function addRow() {
+    const tbody = document.querySelector("#workoutTable tbody");
+    const rowCount = tbody.rows.length + 1;
+
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+        <td>${rowCount}</td>
+
+        <td>
+          <input
+            type="number"
+            name="distance[]"
+            placeholder="400"
+            required
+          >
+        </td>
+
+        <td>
+          <input
+            type="number"
+            name="time[]"
+            placeholder="60"
+            required
+          >
+        </td>
+
+        <td>
+          <button
+            type="button"
+            class="delete-btn"
+            onclick="deleteRow(this)"
+          >
+            X
+          </button>
+        </td>
+      `;
+
+    tbody.appendChild(row);
+}
+
+function deleteRow(button) {
+    const row = button.closest("tr");
+    row.remove();
+    updateSetNumbers();
+}
+
+function updateSetNumbers() {
+    const rows = document.querySelectorAll("#workoutTable tbody tr");
+
+    rows.forEach((row, index) => {
+        row.cells[0].innerText = index + 1;
+    });
+}
 </script>
 
 </body>
