@@ -7,8 +7,7 @@ function requireRole($allowedRoles)
     requireLogin();
 
     if (!in_array($_SESSION['user_role'], $allowedRoles)) {
-        http_response_code(403);
-        exit('Forbidden');
+        redirect("login.php");
     }
 }
 
@@ -27,6 +26,6 @@ function requireLogin()
 function redirectIfLoggedIn()
 {
     if (isUserLoggedIn()) {
-        redirect('dashboard.php');
+        redirect('index.php');
     }
 }

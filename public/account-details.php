@@ -62,7 +62,7 @@ if ($userRole == 'athlete') {
         </div>
 
         <div class="details_edit" id="details_edit" style="display: none;">
-            <form method="POST" action="edit_user.php">
+            <form method="POST" action="edit-user.php">
                 <label for="first_name">First Name:</label>
                 <input type="text" placeholder="<?php echo $first_name?>" name="first_name" id="first_name">
 
@@ -98,7 +98,7 @@ if ($userRole == 'athlete') {
         </div>
 
         <div class="details_edit" id="details_edit" style="display: none;">
-            <form method="POST" action="edit_user.php">
+            <form method="POST" action="edit-user.php">
                 label for="first_name">First Name:</label>
                 <input type="text" placeholder="<?php echo $first_name?>" name="first_name" id="first_name">
 
@@ -148,7 +148,7 @@ if ($userRole == 'athlete') {
         </div>
 
         <div class="details_edit" id="details_edit" style="display: none;">
-            <form method="POST" action="edit_user.php" id="athlete_form">
+            <form method="POST" action="edit-user.php" id="athlete_form">
                 <label for="first_name">First Name:</label>
                 <input type="text" placeholder="<?php echo $first_name?>" name="first_name" id="first_name">
 
