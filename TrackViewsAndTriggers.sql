@@ -60,13 +60,50 @@ GROUP BY Workout.athlete_id, Users.first_name, Users.last_name;
 SELECT * FROM WeeklyTrainingDistance
 ORDER BY average_distance DESC;
 
--- training readiness indicator (red, orange, or green) based on recent data such as workouts, sleep, and soreness over 7–30 days
--- avg workout success (7 days), active injuries, and avg daily calories (30 days)
--- (in-progress)
-# DROP VIEW IF EXISTS TrainingReadinessIndicator;
-#
-# CREATE VIEW TrainingReadinessIndicator AS
-#
-# SELECT * FROM TrainingReadinessIndicator;
+/* TrainingReadinessIndicator (red, orange, or green) based on: 
++ (a) Average workout success over the past 7 days, 
++ (b) Active injuries, 
++ (c) Average daily calories over the past 30 days.
 
-/* Triggers? */
+red = has an active injury, avg workout success < 4, or avg daily calories < 1200
+orange = no active injuries, avg workout success < 7, or avg daily calories < 2000
+green = no active injuries, avg workout success >= 7, and avg daily calories >= 2000
+*/
+DROP VIEW IF EXISTS TrainingReadinessIndicator;
+
+CREATE VIEW TrainingReadinessIndicator AS
+SELECT Athlete.id AS athlete_id, Users.first_name, Users.last_name,
+COALESCE(WorkoutStats.avg_workout_success, 0) AS avg_workout_success_7_days,
+COALESCE(InjuryStats.active_injuries, 0) AS active_injuries,
+COALESCE(MealStats.avg_daily_calories, 0) AS avg_daily_calories_30_days,
+CASE
+	WHEN COALESCE(InjuryStats.active_injuries, 0) > 0 THEN 'R'
+	WHEN COALESCE(WorkoutStats.avg_workout_success, 0) < 4 THEN 'R'
+	WHEN COALESCE(MealStats.avg_daily_calories, 0) < 1200 THEN 'R'
+	WHEN COALESCE(InjuryStats.active_injuries, 0) = 0 AND COALESCE(WorkoutStats.avg_workout_success, 0) < 7 THEN 'O'
+	WHEN COALESCE(InjuryStats.active_injuries, 0) = 0 AND COALESCE(MealStats.avg_daily_calories, 0) < 2000 THEN 'O'
+	WHEN COALESCE(InjuryStats.active_injuries, 0) = 0 AND COALESCE(WorkoutStats.avg_workout_success, 0) >= 7 AND COALESCE(MealStats.avg_daily_calories, 0) >= 2000 THEN 'G'
+END AS training_readiness_indicator
+FROM Athlete JOIN Users ON Athlete.user_id = Users.id
+LEFT JOIN (
+	SELECT athlete_id, AVG(workout_success) AS avg_workout_success
+	FROM Workout
+	WHERE date >= CURDATE() - INTERVAL 7 DAY
+	GROUP BY athlete_id
+) AS WorkoutStats ON Athlete.id = WorkoutStats.athlete_id
+LEFT JOIN (
+	SELECT athlete_id, COUNT(*) AS active_injuries
+	FROM Injury
+	WHERE active = 'Y'
+	GROUP BY athlete_id
+) AS InjuryStats ON Athlete.id = InjuryStats.athlete_id
+LEFT JOIN (
+	SELECT athlete_id, SUM(calories) / 30 AS avg_daily_calories
+	FROM Meal
+	WHERE date >= CURDATE() - INTERVAL 30 DAY
+	GROUP BY athlete_id
+) AS MealStats ON Athlete.id = MealStats.athlete_id
+WHERE Users.role = 'athlete';
+
+SELECT * FROM TrainingReadinessIndicator
+ORDER BY training_readiness_indicator ASC, last_name ASC;
