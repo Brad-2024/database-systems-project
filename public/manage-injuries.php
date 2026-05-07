@@ -122,6 +122,10 @@ if ($userRole === 'trainer') {
                         </option>
                     <?php endforeach; ?>
                 </select>
+
+                <button type="submit">
+                    Add
+                </button>
             </form>
         </div>
     <?php elseif ($userRole === 'trainer'): ?>
