@@ -139,7 +139,7 @@ $readiness_json = json_encode($readiness_counts);
         </div>
         <div class="summary-card">
             <p class="card-label">Avg daily distance</p>
-            <p class="card-value"><?= $avg_distance ?><span style="font-size:1rem;font-weight:400;color:#aaa;"> mi</span></p>
+            <p class="card-value"><?= $avg_distance ?><span style="font-size:1rem;font-weight:400;color:#aaa;"> m</span></p>
             <p class="card-sub">past 7 days</p>
         </div>
     </div>
@@ -525,7 +525,7 @@ new Chart(document.getElementById('distanceChart'), {
     data: {
         labels: distLabels,
         datasets: [{
-            label: 'Avg daily miles',
+            label: 'Avg daily meters',
             data: distValues,
             backgroundColor: '#378add',
             borderRadius: 3,
