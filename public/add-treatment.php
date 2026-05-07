@@ -15,7 +15,7 @@ $athlete_id = $_SESSION['role_id'] ?? -1;
 
 $connection = getDatabaseConnection();
 
-$sql = "INSERT INTO treatment (athlete_id, injury_id, type, treatment_date) VALUES (?, ?, ?, ?)";
+$sql = "INSERT INTO treatment (athlete_id, injury_id, type, date) VALUES (?, ?, ?, ?)";
 
 $stmt = mysqli_prepare($connection, $sql);
 
