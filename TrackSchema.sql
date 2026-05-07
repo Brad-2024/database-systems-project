@@ -40,7 +40,7 @@ CREATE TABLE Athlete (
 	height varchar(7), -- e.g., 5' 11''
 	weight int,
 	dob date,
-	sex enum('M','F','U'), -- U = unspecified?
+	sex enum('M','F','U'), -- U = unspecified
 	grad_year varchar(4), -- e.g., 2028
 	event varchar(150), -- e.g., "60 m, 100 m, long jump, pentathlon" --> not atomic but an athlete can have multiple events?
     tffrs_url varchar(255),
@@ -61,7 +61,7 @@ CREATE TABLE Meet (
 	PRIMARY KEY (id) -- Primary Key for Meet Table
 );
 
--- Create Race Table (weak entity).
+-- Create Race Table
 CREATE TABLE Race (
     id int NOT NULL AUTO_INCREMENT,
 	event varchar(20),
