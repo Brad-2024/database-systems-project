@@ -94,8 +94,12 @@ def insertRace(cursor, params):
     cursor.execute(sql_db, (params['event'], params['time'], params['meet_id'], params['athlete_id'], params['round']))
 
 def checkRace(cursor, params):
-    sql_db = "SeLECT id FROM Race WHERE event = %s AND time = %s AND meet_id = %s AND athlete_id = %s AND round = %s"
-    cursor.execute(sql_db, (params['event'], params['time'], params['meet_id'], params['athlete_id'], params['round']))
+    if params["time"].strip().upper() == "DQ":
+        sql_db = "SELECT id FROM Race WHERE event = %s AND time = %s AND meet_id = %s AND athlete_id = %s"
+        cursor.execute(sql_db, (params["event"],"DQ",params["meet_id"],params["athlete_id"]))
+    else:
+        sql_db = "SELECT id FROM Race WHERE event = %s AND time = %s AND meet_id = %s AND athlete_id = %s AND round = %s"
+        cursor.execute(sql_db, (params['event'], params['time'], params['meet_id'], params['athlete_id'], params['round']))
     result = cursor.fetchone()
     if result:
         return

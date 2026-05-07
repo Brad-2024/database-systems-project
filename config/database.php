@@ -8,10 +8,10 @@ function getDatabaseConnection()
         return $connection;
     }
 
-    $databaseHost = '';
-    $databaseName = '';
-    $databaseUser = '';
-    $databasePassword = '';
+    $databaseHost = 'localhost';
+    $databaseName = 'Track';
+    $databaseUser = 'root';
+    $databasePassword = 'Ninjaman2006';
 
     $connection = mysqli_connect($databaseHost, $databaseUser, $databasePassword, $databaseName);
 

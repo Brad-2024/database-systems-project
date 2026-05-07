@@ -44,12 +44,8 @@ CREATE TABLE Athlete (
 	grad_year varchar(4), -- e.g., 2028
 	event varchar(150), -- e.g., "60 m, 100 m, long jump, pentathlon" --> not atomic but an athlete can have multiple events?
     tffrs_url varchar(255),
-    coach_id int,
-	trainer_id int,
 	training_readiness_indicator enum('R', 'O', 'G'), -- R = Red, O = Orange, G = Green
     FOREIGN KEY (user_id) REFERENCES Users(id),
-	FOREIGN KEY (coach_id) REFERENCES Coach(id), -- Foreign Key to reference Coach Table for id
-	FOREIGN KEY (trainer_id) REFERENCES Trainer(id), -- Foreign Key to reference Trainer Table for id
 	PRIMARY KEY (id) -- Primary Key for Athlete Table
 );
 
@@ -91,10 +87,8 @@ CREATE TABLE Treatment (
 	type enum('scrape', 'ice', 'etc.'), -- probably add more to this...
 	date date,
 	athlete_id int,
-	trainer_id int, 
 	injury_id int,
 	FOREIGN KEY (athlete_id) REFERENCES Athlete(id), -- Foreign Key to reference Athlete Table for id
-	FOREIGN KEY (trainer_id) REFERENCES Trainer(id), -- Foreign Key to reference Trainer Table for id
 	FOREIGN KEY (injury_id) REFERENCES Injury(id), -- Foreign Key to reference Injury Table for id
 	PRIMARY KEY (id) -- Primary Key for Treatment Table
 );

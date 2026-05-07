@@ -6,7 +6,7 @@ require_once __DIR__ . '/../config/database.php';
 requireLogin();
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    redirect('account_details.php');
+    redirect('account-details.php');
 }
 
 $userName = $_SESSION['user_name'] ?? 'User';
@@ -163,11 +163,11 @@ try {
     mysqli_commit($connection);
 
     setFlashData('success', 'User Profile Changed successfully.');
-    redirect('account_details.php');
+    redirect('account-details.php');
 
 } catch (Exception $e) {
     mysqli_rollback($connection);
 
     setFlashData('error', $e->getMessage());
-    redirect('account_details.php');
+    redirect('account-details.php');
 }

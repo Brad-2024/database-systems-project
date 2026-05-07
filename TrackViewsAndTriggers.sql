@@ -5,7 +5,7 @@
 DROP VIEW IF EXISTS ActiveInjuries;
 
 CREATE VIEW ActiveInjuries AS
-SELECT Athlete.id, Users.first_name, Users.last_name, Injury.type, Injury.occurence_date
+SELECT Athlete.id, Users.first_name, Users.last_name, Injury.type, Injury.occurence_date, Injury.id as injury_id
 FROM Athlete JOIN Users ON Athlete.user_id = Users.id JOIN Injury ON Athlete.id = Injury.athlete_id
 WHERE Injury.active = 'Y';
 
