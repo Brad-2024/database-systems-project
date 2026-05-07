@@ -13,6 +13,9 @@ $userRole = $_SESSION['user_role'] ?? 'Role';
         <?php if ($userRole === 'coach'): ?>
             <li class="current"><a href="team-dashboard.php">Dashboard</a></li>
         <?php endif; ?>
+        <?php if ($userRole === 'athlete'): ?>
+            <li class="current"><a href="team-dashboard.php">Dashboard</a></li>
+        <?php endif; ?>
         <?php if ($userRole === 'trainer'): ?>
             <li class="current"><a href="manage-injuries.php">Manage Injuries</a></li>
         <?php endif; ?>
